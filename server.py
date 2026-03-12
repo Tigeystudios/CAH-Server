@@ -155,5 +155,5 @@ def on_pick_winner(data):
     new_round(code)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000)
+    port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host='0.0.0.0', port=8080, debug=True, allow_unsafe_werkzeug=True)

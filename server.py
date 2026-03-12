@@ -144,14 +144,18 @@ def on_pick_winner(data):
 
     room["submissions"] = []
 
-    leaderboard = [{"name": p["name"], "score": p["score"]} for p in room["players"].values()]
+    leaderboard = [{"name": p["name"], "score": p["score"]} for p in room["players"].values()
+                   
+    if sid >= 5:
+        emit('game_over', {'winner': winner_name}, room=room_code)
+        emit('player_results', room=room_code)
+    else:
+        emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
 
-    emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
+        rooms[code]["judge_index"] = (rooms[code]["judge_index"] + 1) % len(rooms[code]["player_order"])
 
-    rooms[code]["judge_index"] = (rooms[code]["judge_index"] + 1) % len(rooms[code]["player_order"])
-
-    socketio.sleep(10)
-    new_round(code)
+        socketio.sleep(10)
+        new_round(code)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

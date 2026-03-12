@@ -144,7 +144,7 @@ def on_pick_winner(data):
 
     room["submissions"] = []
 
-    leaderboard = [{"name": p["name"], "score": p["score"]} for p in room["players"].values()
+    leaderboard = [{"name": p["name"], "score": p["score"]} for p in room["players"]].values()
                    
     if sid >= 5:
         emit('game_over', {'winner': winner_name}, room=room_code)

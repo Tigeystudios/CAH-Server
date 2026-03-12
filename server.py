@@ -12,8 +12,7 @@ with open("answers", "r") as AF:
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'CHIPI_CHIPI_CHAPA_CHAPA_123'
 
-# We remove the 'async_mode' so it automatically picks the best one (Threading)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 rooms = {}
 

@@ -128,6 +128,13 @@ def on_submit_card(data):
         random.shuffle(display_subs)
         emit("judge_reveal", {"submissions": display_subs}, to=judge_sid)
 
+def get_leaderboard(room):
+        leaderboard = []
+        for sid in room["players"]:
+            player = room["players"][sid]
+            leaderboard.append({"name": player["name"], "score": player["score"]})
+        return leaderboard
+
 @socketio.on("pick_winner")
 def on_pick_winner(data):
     code = data.get("code")
@@ -144,19 +151,25 @@ def on_pick_winner(data):
 
     room["submissions"] = []
 
-    leaderboard = [{"name": p["name"], "score": p["score"]} for p in room["players"]].values()
-                   
-    if sid >= 5:
-        emit('game_over', {'winner': winner_name}, room=room_code)
-        emit('player_results', room=room_code)
+    leaderboard = get_leaderboard(room)
+
+    game_done = False
+    for sid in room["players"]:
+        if room["players"][sid]["score"] >= 5:
+            game_done = True
+            break
+    
+    if game_done:
+        emit('game_over', {'winner_name': winner_name}, to=code)
+        emit('player_results', to=code)
     else:
         emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
-
         rooms[code]["judge_index"] = (rooms[code]["judge_index"] + 1) % len(rooms[code]["player_order"])
-
+        
         socketio.sleep(10)
+        
         new_round(code)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host='0.0.0.0', port=8080, debug=True, allow_unsafe_werkzeug=True)
+    port = int(os.environ.get("PORT", 8080))
+    socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)

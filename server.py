@@ -160,6 +160,10 @@ def on_pick_winner(data):
             break
     
     if game_done:
+        emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
+
+        socketio.sleep(3)
+        
         emit('game_over', {'winner_name': winner_name}, to=code)
         emit('player_results', to=code)
     else:

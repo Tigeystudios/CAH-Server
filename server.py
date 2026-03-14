@@ -143,10 +143,11 @@ def on_pick_winner(data):
     if not room or not room["submissions"]: return
 
     winner_name = data.get("winner_name")
+    winning_card_text = ""
 
-    for sub in room["players"]:
+    for sub in room["submissions"]:
         if sub["username"] == winner_name:
-            winning_Card_text = sub["card"]
+            winning_card_text = sub["card"]
             break
     
     for sid in room["players"]:

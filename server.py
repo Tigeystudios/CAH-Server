@@ -144,12 +144,15 @@ def on_pick_winner(data):
 
     winner_name = data.get("winner_name")
 
+    for sub in room["players"]:
+        if sub["username"] == winner_name:
+            winning_Card_text = sub["card"]
+            break
+    
     for sid in room["players"]:
         if room["players"][sid]["name"] == winner_name:
             room["players"][sid]["score"] += 1
             break
-
-    room["submissions"] = []
 
     leaderboard = get_leaderboard(room)
 
@@ -160,15 +163,24 @@ def on_pick_winner(data):
             break
     
     if game_done:
-        emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
+        emit("round_over", {
+            "winner": winner_name,
+            "leaderboard": leaderboard,
+            "winning_card": winning_card_text
+        }, to=code)
 
         socketio.sleep(3)
         
         emit('game_over', {'winner_name': winner_name}, to=code)
         emit('player_results', to=code)
     else:
-        emit("round_over", {"winner": winner_name, "leaderboard": leaderboard}, to=code)
-        rooms[code]["judge_index"] = (rooms[code]["judge_index"] + 1) % len(rooms[code]["player_order"])
+        emit("round_over", {
+            "winner": winner_name,
+            "leaderboard": leaderboard,
+            "winning_card": winning_card_text
+        }, to=code)
+
+        room["submissions"] = []
         
         socketio.sleep(10)
         
